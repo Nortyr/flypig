@@ -1,5 +1,11 @@
 package com.uino.flypig.basis.aboutReflection;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Date;
+
 /**
  * 能够分析类能力的程序称为反射
  * 反射包下的类：
@@ -31,10 +37,95 @@ package com.uino.flypig.basis.aboutReflection;
  */
 public class AboutReflectionTest {
     public static void main(String[] args) {
-        try {
-            Class c=Class.forName("java.util.Date");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        Class c=getClassObject();
+        Class superC=c.getSuperclass();
+        String modifiers= Modifier.toString(c.getModifiers());
+        if(modifiers.length()>0) {
+            System.out.print(modifiers+"  ");
         }
+        System.out.println("class Date");
+        if(superC!=null &&superC !=Object.class){
+            System.out.print("extends"+superC.getName());
+        }
+        System.out.println("\n{");
+        printConstructors(c);
+        System.out.println();
+        printMethods(c);
+        System.out.println();
+        printFields(c);
+        System.out.println("}");
+    }
+
+    private static void printFields(Class c) {
+        Field[] fs=c.getDeclaredFields();
+        for (Field f:fs) {
+            Class type=f.getType();
+            String name=type.getName();
+            System.out.print("  ");
+            String modifiers=Modifier.toString(f.getModifiers());
+            if(modifiers.length()>0){
+                System.out.print(modifiers+" ");
+            }
+            System.out.print(type.getName()+" "+name+";");
+        }
+    }
+
+    private static void printMethods(Class c) {
+        Method[] methods=c.getDeclaredMethods();
+        for (Method m:methods) {
+            Class retType=m.getReturnType();
+            String name=m.getName();
+            System.out.print("   ");
+            String modifiers=Modifier.toString(m.getModifiers());
+            if(modifiers.length()>0){
+                System.out.println(modifiers+"  ");
+            }
+            System.out.println(retType.getName()+" "+name+"(");
+            Class[] paramTypes=m.getParameterTypes();
+            for (int i = 0; i < paramTypes.length; i++) {
+                if(i>0){
+                    System.out.print(",");
+                }
+                System.out.print(paramTypes[i].getName());
+            }
+            System.out.print(");");
+        }
+    }
+
+    private static void printConstructors(Class c) {
+        Constructor[] constructors=c.getConstructors();
+        for (Constructor con:constructors) {
+            String name=c.getName();
+            System.out.print("   ");
+            String modifiers=Modifier.toString(c.getModifiers());
+            if (modifiers.length()>0){
+                System.out.print(modifiers+"  ");
+                System.out.print(name+"(");
+            }
+            Class[] paramTypes=con.getParameterTypes();
+            for (int i = 0; i < paramTypes.length; i++) {
+                if(i>0){
+                    System.out.print(",");
+                }
+                System.out.print(paramTypes[i].getName());
+            }
+            System.out.print(");");
+        }
+    }
+
+    public static Class getClassObject(){
+        //1
+//        Date date=new Date();
+//        Class c=date.getClass();
+        //2
+//        Class c = null;
+//        try {
+//            c=Class.forName("java.util.Date");
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        // 3
+        Class c=Date.class;
+        return c;
     }
 }
